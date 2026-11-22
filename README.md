@@ -58,7 +58,7 @@ python install.py owner/repo                  # 下载 + 解包 + 扫描 + 报�
 python install.py owner/repo --skill deep-read  # 集合仓库里挑一个
 ```
 
-输出四段：文件树（含每个文件大小）、SKILL.md 的 description 字数、危险调用扫描（HIGH/MED/LOW，带 `文件:行号`）、白名单会拷哪些。报告同时落到 `reports/<repo>__<skill>-<时间>.json`。
+输出四段：文件树（含每个文件大小）、SKILL.md 的 description 字数、危险调用扫描（HIGH/MED/LOW，带 `文件:行号`）、白名单会拷哪些。报告同时落到 `reports/<repo>__<skill>-<时间>.json`——报告里有本机绝对路径，该目录（连同 `_staging/`）已在 `.gitignore` 里，别提交。
 
 ### 3. 装
 
