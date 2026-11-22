@@ -98,16 +98,20 @@ def download(url, dest):
 
 def safe_extract(tar, path):
     path = os.path.abspath(path)
+    members = []
     for m in tar.getmembers():
         target = os.path.abspath(os.path.join(path, m.name))
         if not (target == path or target.startswith(path + os.sep)):
             raise SystemExit("unsafe path in tarball: " + m.name)
         if m.issym() or m.islnk():
-            continue
+            raise SystemExit("tarball contains a symlink/hardlink, refusing: " + m.name)
+        if m.isdev():
+            raise SystemExit("tarball contains a device entry, refusing: " + m.name)
+        members.append(m)
     try:
-        tar.extractall(path, filter="data")   # py3.12+: refuse links, devices, odd modes
-    except TypeError:
-        tar.extractall(path)
+        tar.extractall(path, members=members, filter="data")   # py3.12+: also drops unusual modes
+    except TypeError:                                          # py<3.12 has no filter=, but
+        tar.extractall(path, members=members)                  # links/devices were refused above
 
 
 def walk(root):
