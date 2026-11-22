@@ -68,13 +68,15 @@ python "$SC/install.py" owner/repo --skill deep-read --apply --name 自定义名
 
 报告落在技能目录 `reports/<repo>__<skill>-<时间>.json`，里面是完整扫描结果和拷贝清单。
 
-### 4. 冒烟 + 写本机备注
+### 4. 冒烟 + 本机备注（只留本地，不进版本库）
 
-装完**必须用真实文件跑一遍**它自己的命令，确认能出结果，再往 SKILL.md 末尾追加 `## On this machine`：解释器绝对路径、依赖装在哪个 venv、已知坑。没跑通就说没跑通。
+装完**必须用真实文件跑一遍**它自己的命令，确认能出结果。采集到的本机信息（用户名、绝对路径、解释器版本、主机上缺什么工具）**写进你自己的本地笔记，不要提交进任何仓库**：这些内容公开出去就是一份现成的主机指纹。
 
 ```bash
-bash "$SC/probe.sh"      # 采平台/解释器/依赖/密钥变量名，直接贴进备注
+bash "$SC/probe.sh"      # 采平台/解释器/依赖/密钥变量名；输出含 $HOME 与 pwd，别照抄进仓库
 ```
+
+要在公开文档里留一份说明时，只写占位符：`<技能库>/<skill>`、`<Python 3.x>`、`<venv 路径>`，不带盘符、用户名、主机名。
 
 ## 判断清单（这部分脚本替不了）
 
@@ -100,10 +102,12 @@ bash "$SC/probe.sh"      # 采平台/解释器/依赖/密钥变量名，直接�
 - pip 默认源可能挂，用 `-i https://pypi.tuna.tsinghua.edu.cn/simple`。
 - Windows 自带 `curl.exe` 的 Schannel 证书链偶发失败，所以脚本统一走 Python urllib。**证书校验失败时直接报错退出，不降级为不校验**——请求里带 `GH_TOKEN`，裸连等于把 token 交给中间人。遇到这种错就换网络，或 `pip install certifi` 后把 `SSL_CERT_FILE` 指向它的 `cacert.pem`。
 
-## On this machine
+## 本机备注（占位符示例）
 
-- 技能目录：`C:\Users\yangq\.agents\skills\skill-scout`（脚本就在本目录）。
-- 解释器：`C:\Users\yangq\AppData\Local\Programs\Python\Python313\python.exe`（3.13.15）；`python3` 是 Store 占位程序，别用。
-- 本机**没有** `gh`，也没有任何 git 凭据（无 `~/.git-credentials`、无 credential.helper）——要发布仓库只能走浏览器已登录的会话。
-- `pdftotext` 缺席（无 poppler）；`ffmpeg 9.0.2`、`node 26.13.1`、`pnpm 11.28.5` 在。
-- 已验证：`search.py --topic` / `--skill-of` / `--code 无 token 提示`、`install.py` 只审 / `--skill` 选择 / `--apply` 真拷 / 重复跑拒绝覆盖、`probe.sh` 全通过。
+> 真实路径、用户名、主机信息只写进你自己的本地笔记，**不要提交**。公开文档里一律用占位符。
+
+- 技能目录：`<技能库>/skill-scout`
+- 解释器：`<Python 3.x 解释器路径>`（`python3` 可能是 Microsoft Store 占位程序，用 `python`）
+- 本机缺少 `gh`；要发布仓库走已登录的浏览器会话
+- 缺 `pdftotext`（无 poppler）；`ffmpeg` / `node` / `pnpm` 可用
+- 已验证：`search.py --topic` / `--skill-of` / `--code`、`install.py` 只审 / `--skill` 选择 / `--apply` 真拷 / 重复跑拒绝覆盖

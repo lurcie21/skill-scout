@@ -73,7 +73,7 @@ python install.py owner/repo --skill deep-read --apply --name my-name --dest ~/.
 bash probe.sh     # 平台、解释器、依赖、venv、密钥变量名（只打印名字）
 ```
 
-装完一个需要依赖的技能，把 `probe.sh` 的输出和真实冒烟测试结果写进该技能 SKILL.md 末尾的 `## On this machine`。
+装完一个需要依赖的技能，用真实文件冒烟一遍。`probe.sh` 的输出含 `$HOME`、`pwd` 等本机信息，**只写进你自己的本地笔记，不要提交进仓库**；需要公开说明时用占位符（`<技能库>/<skill>`、`<Python 3.x>`）。
 
 ## 设计约定
 

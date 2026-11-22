@@ -300,7 +300,8 @@ def main():
             shutil.copy2(src, dst)
         report["applied"] = True
         print("\n      INSTALLED %d files -> %s" % (len(chosen), target))
-        print("      next: smoke-test it with a real file, then append an 'On this machine' section")
+        print("      next: smoke-test it with a real file; keep machine notes in your own local file, "
+              "not in the repo (they contain your username and absolute paths)")
 
     os.makedirs(os.path.join(HERE, "reports"), exist_ok=True)
     rp = os.path.join(HERE, "reports", "%s__%s-%s.json" % (
