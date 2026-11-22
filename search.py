@@ -47,7 +47,8 @@ def _ctx():
 
 
 def get(url, timeout=30):
-    """GET with a one-shot fallback to unverified TLS (this box's cert chain)."""
+    """GET. TLS failures are fatal ON PURPOSE: this request carries GH_TOKEN,
+    so falling back to an unverified context would hand the token to a MITM."""
     headers = {"Accept": "application/vnd.github+json", "User-Agent": UA}
     if token():
         headers["Authorization"] = "Bearer " + token()
@@ -60,12 +61,10 @@ def get(url, timeout=30):
         detail = e.read()[:300].decode("utf-8", "replace")
         raise SystemExit("HTTP %s %s\n%s" % (e.code, url, detail))
     except (ssl.SSLError, urllib.error.URLError) as e:
-        if "CERTIFICATE" not in str(e).upper() and "SSL" not in str(e).upper():
-            raise SystemExit("network error: %s" % e)
-        insecure = ssl._create_unverified_context()
-        with urllib.request.urlopen(req, timeout=timeout, context=insecure) as r:
-            body = r.read()
-            return json.loads(body.decode("utf-8")), dict(r.headers)
+        raise SystemExit(
+            "network/TLS error: %s\n"
+            "未降级为不校验证书：请求里带 GH_TOKEN，降级等于把 token 交给中间人。\n"
+            "换网络重试；或 pip install certifi 后设置 SSL_CERT_FILE 指向其 cacert.pem。" % e)
 
 
 def age_days(iso):

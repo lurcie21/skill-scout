@@ -83,7 +83,7 @@ bash probe.sh     # 平台、解释器、依赖、venv、密钥变量名（只�
 - **不 `git clone`。** 下 tar 包，避免 `.git`、hooks、submodule 一起进来。
 - **解包做路径穿越校验**，并拒绝符号链接/硬链接/设备文件（Python 3.12+ 走 `filter="data"`）。
 - 有 HIGH 命中且没 `--force`，拒绝拷贝。目标目录已存在也拒绝覆盖。
-- 只用标准库；TLS 失败时自动降级重试一次（Windows `curl.exe` 的 Schannel 证书链问题绕开）。
+- 只用标准库；TLS 校验失败**直接报错，不降级**（请求带 `GH_TOKEN`，不校验证书的连接等于把 token 交给中间人）。Windows 的 Schannel 证书链问题请换网络或指定 `SSL_CERT_FILE`。
 
 ## 已知平台差异
 

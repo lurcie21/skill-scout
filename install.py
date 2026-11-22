@@ -72,15 +72,14 @@ def get_json(url):
     if token():
         headers["Authorization"] = "Bearer " + token()
     req = urllib.request.Request(url, headers=headers)
-    for ctx in (ssl_ctx(), ssl._create_unverified_context()):
-        try:
-            with urllib.request.urlopen(req, timeout=40, context=ctx) as r:
-                return json.loads(r.read().decode("utf-8"))
-        except ssl.SSLError:
-            continue
-        except Exception as e:
-            raise SystemExit("API error: %s" % e)
-    raise SystemExit("TLS failed for " + url)
+    try:
+        with urllib.request.urlopen(req, timeout=40, context=ssl_ctx()) as r:
+            return json.loads(r.read().decode("utf-8"))
+    except ssl.SSLError as e:
+        raise SystemExit("TLS error for %s: %s\n"
+                         "不做不校验证书的降级（请求带 GH_TOKEN）。" % (url, e))
+    except Exception as e:
+        raise SystemExit("API error: %s" % e)
 
 
 def download(url, dest):
@@ -88,14 +87,13 @@ def download(url, dest):
     if token():
         headers["Authorization"] = "Bearer " + token()
     req = urllib.request.Request(url, headers=headers)
-    for ctx in (ssl_ctx(), ssl._create_unverified_context()):
-        try:
-            with urllib.request.urlopen(req, timeout=120, context=ctx) as r, open(dest, "wb") as f:
-                shutil.copyfileobj(r, f)
-            return os.path.getsize(dest)
-        except ssl.SSLError:
-            continue
-    raise SystemExit("download failed: " + url)
+    try:
+        with urllib.request.urlopen(req, timeout=120, context=ssl_ctx()) as r, open(dest, "wb") as f:
+            shutil.copyfileobj(r, f)
+        return os.path.getsize(dest)
+    except ssl.SSLError as e:
+        raise SystemExit("TLS error for %s: %s\n"
+                         "不做不校验证书的降级（请求带 GH_TOKEN）。" % (url, e))
 
 
 def safe_extract(tar, path):

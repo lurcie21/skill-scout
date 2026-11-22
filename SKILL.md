@@ -98,7 +98,7 @@ bash "$SC/probe.sh"      # 采平台/解释器/依赖/密钥变量名，直接�
 - 传给 Python 的路径用 `C:/Users/...` 或 `C:\\Users\\...`；MSYS 的 `/c/Users/...` Python 不认。
 - `rm -rf` 越界会被安全网拦；删目录用 `python -c "import shutil; shutil.rmtree(r'C:/...')"`。
 - pip 默认源可能挂，用 `-i https://pypi.tuna.tsinghua.edu.cn/simple`。
-- Windows 自带 `curl.exe` 的 Schannel 证书链偶发失败，脚本统一走 Python urllib，失败时自动降级不校验证书重试一次。
+- Windows 自带 `curl.exe` 的 Schannel 证书链偶发失败，所以脚本统一走 Python urllib。**证书校验失败时直接报错退出，不降级为不校验**——请求里带 `GH_TOKEN`，裸连等于把 token 交给中间人。遇到这种错就换网络，或 `pip install certifi` 后把 `SSL_CERT_FILE` 指向它的 `cacert.pem`。
 
 ## On this machine
 
